@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     Button login, signup;
     FirebaseAuth mFirebaseAuth;
     ProgressBar progressBar;
+    String email;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
     @Override
@@ -47,9 +49,15 @@ public class MainActivity extends AppCompatActivity {
                 FirebaseUser mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
                 if (mFirebaseUser != null) {
-                    Toast.makeText(MainActivity.this, "You are logged in", Toast.LENGTH_SHORT).show();
-                    Intent i = new Intent(MainActivity.this, HomeActivity.class);
-                    startActivity(i);
+                    if (mFirebaseUser.isEmailVerified()){
+                        Toast.makeText(MainActivity.this, "You are logged in", Toast.LENGTH_SHORT).show();
+                        String id = mFirebaseUser.getUid();
+                        String user = mFirebaseUser.getEmail();
+                        Intent intoHome = new Intent(getApplicationContext(), FirstPage.class);
+                        intoHome.putExtra("id", id);
+                        intoHome.putExtra("user", user);
+                        startActivity(intoHome);
+                    }
                 } else {
                     Toast.makeText(MainActivity.this, "Please Login", Toast.LENGTH_SHORT).show();
                 }
@@ -60,8 +68,9 @@ public class MainActivity extends AppCompatActivity {
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String email = emailId.getText().toString();
+                email = emailId.getText().toString();
                 String password = passwordId.getText().toString();
+
                 if (email.isEmpty()) {
                     emailId.setError("Please enter Email Id");
                     emailId.requestFocus();
@@ -74,11 +83,22 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
-                                Intent intoHome = new Intent(getApplicationContext(), HomeActivity.class);
-                                startActivity(intoHome);
+                                FirebaseUser mFirebaseUser = mFirebaseAuth.getCurrentUser();
+                                if (mFirebaseUser.isEmailVerified()){
+                                        Toast.makeText(MainActivity.this, "You are logged in", Toast.LENGTH_SHORT).show();
+                                    String id = mFirebaseUser.getUid();
+                                    String user = mFirebaseUser.getEmail();
+                                    Intent intoHome = new Intent(getApplicationContext(), FirstPage.class);
+                                    intoHome.putExtra("id", id);
+                                    intoHome.putExtra("user", user);
+                                        startActivity(intoHome);
+                                    }
+                                    else{
+                                        Toast.makeText(MainActivity.this, "Your Email not verified!, Please check your email for verification link.", Toast.LENGTH_LONG).show();
+                                    }
                             } else {
                                 progressBar.setVisibility(View.INVISIBLE);
-                                Toast.makeText(getApplicationContext(), "Login Error, Please Login Again", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "Login Error, Please Login Again or Sign Up if does not have account", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
