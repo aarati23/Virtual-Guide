@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".HomeActivity"
-    android:background="@drawable/back1">
+    android:background="@drawable/shadow">
 
 
     <LinearLayout
@@ -38,17 +38,19 @@
                 android:height="50dp"
                 android:textAlignment="center"
                 android:textColor="#fff"
-                android:hint="Enter any Landmark/Monument"/>
+                android:hint="Search for any Landmark/Monument"/>
 
 
             <Button
                 android:id="@+id/search"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="150dp"
+                android:layout_marginLeft="60dp"
+                android:layout_marginRight="60dp"
                 android:layout_marginTop="20dp"
                 android:text="Search"
-                android:background="@drawable/shadow3"
+
+                android:background="@drawable/button4"
                 android:textColor="#fff"
                 android:textStyle="bold"
                 android:layout_marginBottom="20dp"/>
@@ -60,7 +62,11 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/textview_border"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginBottom="5dp"
                     android:orientation="vertical">
 
                     <TextView
@@ -69,15 +75,18 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
                         android:textAlignment="center"
-                        android:textColor="#fff"
+                        android:textColor="#000"
                         android:textSize="30dp"
                         android:textStyle="bold" />
 
                     <ImageView
                         android:id="@+id/img"
-                        android:layout_width="300dp"
+                        android:layout_width="match_parent"
                         android:layout_height="200dp"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
                         android:layout_gravity="center_horizontal"
+
                         android:layout_marginTop="5dp" />
 
                     <TextView
@@ -87,9 +96,9 @@
                         android:layout_marginTop="20dp"
                         android:paddingStart="10dp"
                         android:paddingEnd="10dp"
-                        android:fontFamily="serif-monospace"
+                        android:fontFamily="arial"
                         android:textStyle="bold"
-                        android:textColor="#fff"/>
+                        android:textColor="#000"/>
 
                     <TextView
                         android:id="@+id/description2"
@@ -98,24 +107,25 @@
                         android:layout_marginTop="10dp"
                         android:paddingStart="10dp"
                         android:paddingEnd="10dp"
-                        android:fontFamily="serif-monospace"
+                        android:fontFamily="arial"
                         android:textStyle="bold"
-                        android:textColor="#fff"/>
+                        android:textColor="#000"/>
 
                     <RelativeLayout
                         android:id="@+id/buttons"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:visibility="invisible">
+                        android:visibility="invisible"
+                        android:layout_marginBottom="10dp">
 
                         <Button
                             android:id="@+id/butt1"
                             android:layout_width="130dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="40dp"
+                            android:layout_marginStart="20dp"
                             android:text="More Images"
-                            android:background="@drawable/button3"
+                            android:background="@drawable/button4"
                             android:layout_marginTop="20dp"
                             android:textColor="#fff"
                             android:textStyle="bold"/>
@@ -124,10 +134,10 @@
                             android:id="@+id/butt2"
                             android:layout_width="130dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="50dp"
+                            android:layout_marginLeft="60dp"
                             android:layout_toRightOf="@+id/butt1"
                             android:text="See on Map"
-                            android:background="@drawable/button3"
+                            android:background="@drawable/button4"
                             android:layout_marginTop="20dp"
                             android:textColor="#fff"
                             android:textStyle="bold"/>
@@ -136,10 +146,10 @@
                             android:id="@+id/butt3"
                             android:layout_width="130dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="40dp"
+                            android:layout_marginStart="20dp"
                             android:layout_below="@+id/butt1"
                             android:text="More Info"
-                            android:background="@drawable/button3"
+                            android:background="@drawable/button4"
                             android:layout_marginTop="20dp"
                             android:textColor="#fff"
                             android:textStyle="bold"/>
@@ -148,11 +158,11 @@
                             android:id="@+id/butt4"
                             android:layout_width="130dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="50dp"
+                            android:layout_marginStart="60dp"
                             android:layout_toRightOf="@+id/butt1"
                             android:layout_below="@+id/butt1"
                             android:text="Add Info"
-                            android:background="@drawable/button3"
+                            android:background="@drawable/button4"
                             android:layout_marginTop="20dp"
                             android:textColor="#fff"
                             android:textStyle="bold"/>

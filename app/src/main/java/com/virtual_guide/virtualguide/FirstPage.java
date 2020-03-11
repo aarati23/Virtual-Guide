@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -210,12 +211,11 @@ class ImageAdapter2 extends PagerAdapter{
             public void onClick(View view){
                 String user = FirstPage.user;
                 String id = FirstPage.id;
-                Intent intoSearch = new Intent(mContext, HomeActivity.class);
-                intoSearch.putExtra("user", user);
-                intoSearch.putExtra("id", id);
 
-                Intent intoAddInfo = new Intent(mContext, ClassifierActivity.class);
-                mContext.startActivity(intoAddInfo);
+                Intent intoClassifier = new Intent(mContext, ClassifierActivity.class);
+                intoClassifier.putExtra("user", user);
+                intoClassifier.putExtra("id", id);
+                mContext.startActivity(intoClassifier);
             }
         });
 
@@ -265,6 +265,7 @@ class ImageAdapter3 extends PagerAdapter{
             public void onClick(View view){
                 String user = FirstPage.user;
                 String id = FirstPage.id;
+//                Log.d("#$#%~~~~~~~~~~~Username",user);
                 Intent intoAddInfo = new Intent(mContext, HomeActivity.class);
                 intoAddInfo.putExtra("user", user);
                 intoAddInfo.putExtra("id", id);

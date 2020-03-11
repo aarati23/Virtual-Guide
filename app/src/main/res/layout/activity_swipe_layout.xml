@@ -12,20 +12,36 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true" />
 
-    <TextView
-        android:id="@+id/textView1"
-        android:background="@drawable/shadow"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="20dp"
-        android:paddingBottom="20dp"
+        android:orientation="horizontal"
         android:layout_alignStart="@+id/imageView1"
         android:layout_alignEnd="@+id/imageView1"
-        android:layout_centerVertical="true"
-        android:gravity="center"
-        android:textSize="40sp"
-        android:text="Virtual Guide"
-        android:fontFamily="@font/robotoregular"
-        android:textColor="#fff" />
+        android:layout_centerVertical="true">
+
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_weight="1"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:src="@drawable/logo"
+            android:background="@drawable/shadow"/>
+
+        <TextView
+            android:id="@+id/textView1"
+            android:background="@drawable/shadow"
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_height="100dp"
+            android:gravity="center_vertical"
+            android:textSize="35sp"
+            android:text="Virtual Guide"
+            android:fontFamily="@font/robotoregular"
+            android:textColor="#fff" />
+
+    </LinearLayout>
 
 </RelativeLayout>

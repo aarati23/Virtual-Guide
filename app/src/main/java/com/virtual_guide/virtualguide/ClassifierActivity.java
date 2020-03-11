@@ -104,8 +104,14 @@ public class ClassifierActivity extends CameraActivity implements OnImageAvailab
                 // Send title to Homeactivity
                 String titleCamera = results.get(0).getTitle();
 
+                Intent intent = getIntent();
+                String user = intent.getStringExtra("user");
+                String id = intent.getStringExtra("id");
+
                 Intent intoHome = new Intent(ClassifierActivity.this, HomeActivity.class);
                 intoHome.putExtra("titleCamera", titleCamera);
+                intoHome.putExtra("user", user);
+                intoHome.putExtra("id", id);
                 startActivity(intoHome);
 
                 Toast.makeText(getApplicationContext(),CameraActivity.aaa.get(0),Toast.LENGTH_SHORT).show();

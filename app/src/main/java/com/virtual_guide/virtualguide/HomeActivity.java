@@ -74,7 +74,7 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                scrollView.setBackgroundResource(R.drawable.back3);
+                scrollView.setBackgroundResource(R.drawable.white);
                 place = landmark.getText().toString();
                 url = "https://en.wikipedia.org/wiki/" + place;
                 Content content = new Content();
@@ -86,7 +86,7 @@ public class HomeActivity extends AppCompatActivity {
             Intent intent = getIntent();
             String titleCamera = intent.getStringExtra("titleCamera");
             if(!titleCamera.isEmpty()){
-                scrollView.setBackgroundResource(R.drawable.back3);
+                scrollView.setBackgroundResource(R.drawable.white);
                 place = titleCamera;
                 url = "https://en.wikipedia.org/wiki/" + place;
                 Content content = new Content();
@@ -113,6 +113,7 @@ public class HomeActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = getIntent();
                 String user = intent.getStringExtra("user");
+                Log.d("%&%%&Username",user);
                 String id = intent.getStringExtra("id");
                 Intent intoAddInfo = new Intent(HomeActivity.this, AddInfo.class);
                 intoAddInfo.putExtra("user", user);
@@ -136,13 +137,14 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-//        seeMap.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intoStorage = new Intent(HomeActivity.this, Storage.class);
-//                startActivity(intoStorage);
-//            }
-//        });
+        seeMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intoMap = new Intent(HomeActivity.this, MapsActivity.class);
+                intoMap.putExtra("landmark", placeTitle);
+                startActivity(intoMap);
+            }
+        });
 
 
     }

@@ -88,7 +88,6 @@ public class ViewInfo extends AppCompatActivity {
 
     private FirebaseStorage storage;
     private StorageReference storageReference;
-    private DatabaseReference databaseReference;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -97,13 +96,19 @@ public class ViewInfo extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 //        setContentView(R.layout.activity_view_info);
 
+        try {
+            FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                    .setPersistenceEnabled(false)
+                    .build();
+            db.setFirestoreSettings(settings);
+        }
+        catch (Exception e){
+            Log.d("~~~~~~~~~~~~~~~Excepion",e.toString());
+        }
+
+
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
-
-        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
-                .setPersistenceEnabled(false)
-                .build();
-        db.setFirestoreSettings(settings);
 
         //need only once
         // First Parent LinearLayout

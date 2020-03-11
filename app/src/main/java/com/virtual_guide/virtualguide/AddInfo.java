@@ -3,6 +3,7 @@ package com.virtual_guide.virtualguide;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -13,7 +14,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -33,6 +36,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -42,6 +46,7 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -51,7 +56,7 @@ public class AddInfo extends AppCompatActivity {
 
     private ImageView addImage;
     private static final int pick = 1;
-    Uri imageUri;
+    Uri imageUri, photoURI;
     private EditText imgdesc, title, desc;
 
     private FirebaseStorage storage;
@@ -85,28 +90,6 @@ public class AddInfo extends AppCompatActivity {
             }
         });
 
-        EnableRuntimePermission();
-
-        Button photoButton = (Button) this.findViewById(R.id.cam);
-
-        photoButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-//                    startActivityForResult(takePictureIntent, pick);
-                }
-            }
-        });
-
-    }
-
-    public Uri getImageUri(Context inContext, Bitmap inImage) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
-        return Uri.parse(path);
     }
 
 
@@ -115,13 +98,15 @@ public class AddInfo extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == pick && resultCode == RESULT_OK && data != null) {
-            imageUri = data.getData();
-            try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
-                addImage.setImageBitmap(bitmap);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            try{
+                imageUri = data.getData();
+                Log.d("~~~~~~~~~~~~~~~ImageURI",imageUri.toString());
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+                    addImage.setImageBitmap(bitmap);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
         }
     }
 
@@ -160,6 +145,7 @@ public class AddInfo extends AppCompatActivity {
         final String currentDateandTime = "on " + sdf.format(new Date());
 
         if (imageUri != null) {
+            Log.d("~~~~~~~2~~~~~~~ImageURI",imageUri.toString());
             StorageReference riversRef = storageReference.child(userId + '/' + imgTitleString + "." + getFileExtension(imageUri));
 
             riversRef.putFile(imageUri)
@@ -188,6 +174,13 @@ public class AddInfo extends AppCompatActivity {
                                 public void onSuccess(DocumentReference documentReference) {
                                     p.dismiss();
                                     Toast.makeText(AddInfo.this, "Note Saved!", Toast.LENGTH_SHORT).show();
+                                    Handler handler = new Handler();
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            finish();
+                                        }
+                                    }, 1000);
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
                                 @Override
@@ -219,50 +212,6 @@ public class AddInfo extends AppCompatActivity {
             Toast.makeText(AddInfo.this, "No Image File Selected", Toast.LENGTH_SHORT).show();
         }
 
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                finish();
-            }
-        }, 6000);
-
-    }
-
-    public void EnableRuntimePermission(){
-
-        if (ActivityCompat.shouldShowRequestPermissionRationale(AddInfo.this,
-                Manifest.permission.CAMERA))
-        {
-
-            Toast.makeText(AddInfo.this,"CAMERA permission allows us to Access CAMERA app", Toast.LENGTH_LONG).show();
-
-        } else {
-
-            ActivityCompat.requestPermissions(AddInfo.this,new String[]{
-                    Manifest.permission.CAMERA}, RequestPermissionCode);
-
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int RC, String per[], int[] PResult) {
-
-        switch (RC) {
-
-            case RequestPermissionCode:
-
-                if (PResult.length > 0 && PResult[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    Toast.makeText(AddInfo.this,"Permission Granted, Now your application can access CAMERA.", Toast.LENGTH_LONG).show();
-
-                } else {
-
-                    Toast.makeText(AddInfo.this,"Permission Canceled, Now your application cannot access CAMERA.", Toast.LENGTH_LONG).show();
-
-                }
-                break;
-        }
     }
 
 }

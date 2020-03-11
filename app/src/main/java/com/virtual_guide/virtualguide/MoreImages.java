@@ -49,7 +49,7 @@ public class MoreImages extends AppCompatActivity {
         bitmap = new Bitmap[40];
         img = new ImageView[40];
 
-        for(int i = 0; i< 20; i++){
+        for(int i = 0; i < 20; i++){
             String imeg = "img" + (i+1);
             int id = getResources().getIdentifier(imeg, "id", getPackageName());
             img[i] = findViewById(id);
@@ -61,7 +61,7 @@ public class MoreImages extends AppCompatActivity {
 //        String str = intent.getStringExtra("Placename");
 
         scrollView.setBackgroundResource(R.drawable.back3);
-        url = "https://www.shutterstock.com/search/" + "taj mahal";
+        url = "https://unsplash.com/s/photos/" + "taj mahal";
         MoreImages.Content content = new MoreImages.Content();
         content.execute();
 
@@ -83,14 +83,15 @@ public class MoreImages extends AppCompatActivity {
             try {
                 Document document = Jsoup.connect(url).get();
 
-                for(int j = 10; j < 50; j++){
+                for(int j = 10; j < 1000; j++){
                     try{
                         image1[i] = document.select("img").get(j);
                         imgSrc[i] = image1[i].absUrl("src");
                         input[i] = new java.net.URL(imgSrc[i]).openStream();
                         bitmap[i] = BitmapFactory.decodeStream(input[i]);
-                        if(i < 3){
+                        if(i < 20){
                             i++;
+                            System.out.println("~~~~~~~~i(+)~~~~~~~"+i);
                         }
                         else{
                             break;
@@ -98,8 +99,9 @@ public class MoreImages extends AppCompatActivity {
                     }
                     catch (Exception e){
                         System.out.println("********imageerror***********");
-                        i--;
+                        System.out.println("~~~~~~~~i(-)~~~~~~~"+i);
                     }
+                    System.out.println("~~~~~~~~j(+)~~~~~~~"+j);
                 }
 
 
@@ -117,11 +119,18 @@ public class MoreImages extends AppCompatActivity {
                 try {
                     img[i].setImageBitmap(bitmap[k]);
                     i++;
+                    System.out.println("~~~~~Post~~~i(+)~~~~~~~"+i);
                 }
                 catch(Exception e){
 
                 }
-                k++;
+                if(k!=990) {
+                    k++;
+                }
+                else {
+                    break;
+                }
+                System.out.println("~~~~~Post~~~k(+)~~~~~~~"+k);
             }
 
             p.dismiss();

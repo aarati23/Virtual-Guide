@@ -38,13 +38,11 @@
 
         <Button
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="70dp"
             android:text="GET INFORMATION"
             android:background="@drawable/shadow3"
             android:id="@+id/butt"
             android:textColor="#fff"
-            android:paddingStart="5dp"
-            android:paddingEnd="5dp"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="467dp"
             android:paddingBottom="0dp"> </Button>
