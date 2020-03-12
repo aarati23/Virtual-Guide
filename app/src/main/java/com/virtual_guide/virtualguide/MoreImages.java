@@ -3,20 +3,26 @@ package com.virtual_guide.virtualguide;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -27,7 +33,6 @@ import java.io.InputStream;
 
 public class MoreImages extends AppCompatActivity {
 //
-    ImageView[] img;
     ProgressDialog p;
     String url;
     String[] imgSrc;
@@ -36,32 +41,27 @@ public class MoreImages extends AppCompatActivity {
     InputStream[] input;
     Bitmap[] bitmap;
     ScrollView scrollView;
+    LinearLayout imageList;
 //
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);//will hide the title
-        getSupportActionBar().hide(); //hide the title bar
+//        requestWindowFeature(Window.FEATURE_NO_TITLE);//will hide the title
+//        getSupportActionBar().hide(); //hide the title bar
         setContentView(R.layout.moreimages);
 
         image1 = new Element[40];
         imgSrc = new String[40];
         input = new InputStream[40];
         bitmap = new Bitmap[40];
-        img = new ImageView[40];
-
-        for(int i = 0; i < 20; i++){
-            String imeg = "img" + (i+1);
-            int id = getResources().getIdentifier(imeg, "id", getPackageName());
-            img[i] = findViewById(id);
-        }
 
         scrollView = findViewById(R.id.scrollView);
+        imageList = findViewById(R.id.imageList);
 
-//        Intent intent = getIntent();
-//        String str = intent.getStringExtra("Placename");
+        Intent intent = getIntent();
+        String str = intent.getStringExtra("Placename");
 
-        scrollView.setBackgroundResource(R.drawable.back3);
-        url = "https://unsplash.com/s/photos/" + "taj mahal";
+        scrollView.setBackgroundResource(R.drawable.back1);
+        url = "https://unsplash.com/s/photos/" + str;
         MoreImages.Content content = new MoreImages.Content();
         content.execute();
 
@@ -83,7 +83,7 @@ public class MoreImages extends AppCompatActivity {
             try {
                 Document document = Jsoup.connect(url).get();
 
-                for(int j = 10; j < 1000; j++){
+                for(int j = 10; j < 40; j++){
                     try{
                         image1[i] = document.select("img").get(j);
                         imgSrc[i] = image1[i].absUrl("src");
@@ -117,14 +117,24 @@ public class MoreImages extends AppCompatActivity {
             int i  = 0;
             while(i < 20) {
                 try {
-                    img[i].setImageBitmap(bitmap[k]);
+                    if(bitmap[k] == null){
+                        break;
+                    }
+                    ImageView imageView = new ImageView(MoreImages.this);
+                    LinearLayout.LayoutParams imgParams = new LinearLayout.LayoutParams(dpToPX(350), dpToPX(250));
+                    imgParams.gravity = Gravity.CENTER_HORIZONTAL;
+                    imgParams.setMargins(0, dpToPX(20), 0, 0);
+                    imageView.setLayoutParams(imgParams);
+                    imageView.setBackground(ContextCompat.getDrawable(MoreImages.this, R.drawable.addimg));
+                    imageView.setImageBitmap(bitmap[k]);
+                    imageList.addView(imageView);
                     i++;
                     System.out.println("~~~~~Post~~~i(+)~~~~~~~"+i);
                 }
                 catch(Exception e){
 
                 }
-                if(k!=990) {
+                if(k!=20) {
                     k++;
                 }
                 else {
@@ -134,7 +144,19 @@ public class MoreImages extends AppCompatActivity {
             }
 
             p.dismiss();
+            scrollView.setBackgroundResource(R.drawable.navbar);
         }
+    }
+
+    public int dpToPX(int dp) {
+        Resources r = this.getResources();
+        int px = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                dp,
+                r.getDisplayMetrics()
+        );
+
+        return px;
     }
 
 }

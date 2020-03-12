@@ -104,6 +104,24 @@ public class ViewInfo extends AppCompatActivity {
         }
         catch (Exception e){
             Log.d("~~~~~~~~~~~~~~~Excepion",e.toString());
+            try {
+                FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                        .setPersistenceEnabled(false)
+                        .build();
+                db.setFirestoreSettings(settings);
+            }
+            catch (Exception e1){
+                Log.d("~~~~~~~~~~~~~~~Excepion",e.toString());
+                try {
+                    FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                            .setPersistenceEnabled(false)
+                            .build();
+                    db.setFirestoreSettings(settings);
+                }
+                catch (Exception e2){
+                    Log.d("~~~~~~~~~~~~~~~Excepion",e.toString());
+                }
+            }
         }
 
 
@@ -116,7 +134,7 @@ public class ViewInfo extends AppCompatActivity {
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         linearLayout.setPadding(dpToPX(10), dpToPX(20), dpToPX(10), dpToPX(10));
-        linearLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.navbar));
+        linearLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.back3));
         linearLayout.setLayoutParams(params);
 
         // Scroll view inside linearLayout
@@ -304,6 +322,8 @@ public class ViewInfo extends AppCompatActivity {
                         Log.d("Likes_________________:", "" + liked);
                         likeView.setText("Total Likes:" + Integer.toString(liked));
                         linearLayout2.addView(likeView);
+
+                        linearLayout.setBackground(ContextCompat.getDrawable(ViewInfo.this, R.drawable.navbar));
 
 
                     } else {

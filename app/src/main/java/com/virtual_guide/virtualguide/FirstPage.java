@@ -19,7 +19,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.ViewFlipper;
-
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Timer;

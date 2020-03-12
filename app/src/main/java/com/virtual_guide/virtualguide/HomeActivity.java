@@ -1,29 +1,41 @@
 package com.virtual_guide.virtualguide;
 
+import android.Manifest;
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.firebase.auth.FirebaseAuth;
+import androidx.core.app.NotificationCompat;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -31,10 +43,14 @@ import org.jsoup.nodes.Element;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity{
 
-    Button search, moreImages, seeMap, addInfo, moreInfo;
+    Button search, moreImages, seeMap, addInfo, moreInfo, moreMore;
+    LinearLayout seeMore;
     TextView title, desc, desc2;
     ImageView img;
     EditText landmark;
@@ -48,7 +64,8 @@ public class HomeActivity extends AppCompatActivity {
     Bitmap bitmap;
     ScrollView scrollView;
     RelativeLayout relative;
-    int flagg = 0;
+    int flagText = 0;
+    Element[] para3 = new Element[100];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +86,8 @@ public class HomeActivity extends AppCompatActivity {
         seeMap = findViewById(R.id.butt2);
         moreInfo = findViewById(R.id.butt3);
         addInfo = findViewById(R.id.butt4);
+        seeMore = findViewById(R.id.Wiki);
+        moreMore = findViewById(R.id.moreMore);
 
         search.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,8 +96,13 @@ public class HomeActivity extends AppCompatActivity {
                 scrollView.setBackgroundResource(R.drawable.white);
                 place = landmark.getText().toString();
                 url = "https://en.wikipedia.org/wiki/" + place;
-                Content content = new Content();
-                content.execute();
+                try{
+                    Content content = new Content();
+                    content.execute();
+                }
+                catch (Exception e){
+                    Toast.makeText(HomeActivity.this, "Invalid Landmark/Monument name", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -146,8 +170,17 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-
     }
+
+    public void seeMoreInfo(View view) {
+        flagText = 1;
+        moreMore.setVisibility(View.INVISIBLE);
+        Content content = new Content();
+        content.execute();
+    }
+
+
+    //To fetch and display details of monument/landmarks
 
     private class Content extends AsyncTask<Void, Void, Void> {
         @Override
@@ -177,6 +210,16 @@ public class HomeActivity extends AppCompatActivity {
                 }
                 para1 = document.select("p").get(i);
                 para2 = document.select("p").get(i + 1);
+                if(flagText == 1){
+                    for(int k = 2; k < 100; k++){
+                        if(!document.select("p").get(i + k).text().isEmpty()){
+                            para3[k-2] = document.select("p").get(i + k);
+                        }
+                        else{
+                            break;
+                        }
+                    }
+                }
                 link = document.select("table").first();
                 image1 = link.select("img").first();
                 imgSrc = image1.absUrl("src");
@@ -194,9 +237,44 @@ public class HomeActivity extends AppCompatActivity {
             img.setImageBitmap(bitmap);
             desc.setText(para1.text());
             desc2.setText(para2.text());
+            if(flagText == 1){
+                for(int j = 0; j < 98; j++){
+                    if(para3[j] != null){
+                        TextView descView = new TextView(HomeActivity.this);
+                        LinearLayout.LayoutParams descParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                        descParams.setMargins(0, dpToPX(20), 0, 0);
+                        descView.setLayoutParams(descParams);
+                        descView.setTextColor(Color.parseColor("black"));
+//                        descView.setTextSize(18);
+                        descView.setTypeface(null, Typeface.BOLD);
+//                        descView.setFontFeatureSettings("arial");
+                        descView.setText(para3[j].text());
+                        seeMore.addView(descView);
+                    }
+                    else{
+                        break;
+                    }
+                }
+
+            }
             p.dismiss();
+            if (flagText == 0){
+                moreMore.setVisibility(View.VISIBLE);
+            }
             relative.setVisibility(View.VISIBLE);
         }
+    }
+
+
+    public int dpToPX(int dp) {
+        Resources r = this.getResources();
+        int px = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                dp,
+                r.getDisplayMetrics()
+        );
+
+        return px;
     }
 
 }

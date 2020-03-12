@@ -210,6 +210,30 @@ public class AddInfo extends AppCompatActivity {
                             });
         } else {
             Toast.makeText(AddInfo.this, "No Image File Selected", Toast.LENGTH_SHORT).show();
+            String imageUrl = "";
+            Note note = new Note(username, currentDateandTime, titleString, imgTitleString, imageUrl, descriptionString, place.toLowerCase(), 0);
+
+            notebookRef.add(note).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                @Override
+                public void onSuccess(DocumentReference documentReference) {
+                    p.dismiss();
+                    Toast.makeText(AddInfo.this, "Note Saved!", Toast.LENGTH_SHORT).show();
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            finish();
+                        }
+                    }, 1000);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    p.dismiss();
+                    Toast.makeText(AddInfo.this, "Error Occurred!", Toast.LENGTH_SHORT).show();
+                    Log.d("AddInfo", e.toString());
+                }
+            });
         }
 
     }

@@ -15,13 +15,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class Signup extends AppCompatActivity {
 
-    EditText emailId, passwordId;
+    EditText emailId;
+    TextInputEditText passwordId;
     Button login, signup;
     FirebaseAuth mFirebaseAuth;
     ProgressBar progressBar;
@@ -40,7 +42,6 @@ public class Signup extends AppCompatActivity {
         login = findViewById(R.id.login);
         signup = findViewById(R.id.signup);
         progressBar = findViewById(R.id.progressbar);
-
 
 
         signup.setOnClickListener(new View.OnClickListener() {
@@ -62,7 +63,7 @@ public class Signup extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if(!task.isSuccessful()){
-                                Toast.makeText(Signup.this, "SignUp Unsuccessful, Please Try Again",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(Signup.this, "SignUp Unsuccessful, Please Try Again! Length of Password should be greater than 8",Toast.LENGTH_SHORT).show();
                                 progressBar.setVisibility(View.INVISIBLE);
                             }
                             else {

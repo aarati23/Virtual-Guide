@@ -66,4 +66,5 @@ dependencies {
     implementation 'com.firebase:geofire-android:3.0.0'
     implementation 'com.google.firebase:firebase-database:19.2.1'
     implementation 'com.karumi:dexter:6.0.2'
+    compile 'com.sdsmdg.tastytoast:tastytoast:0.1.1'
 }
