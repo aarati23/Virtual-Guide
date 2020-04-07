@@ -37,6 +37,33 @@ import android.widget.VideoView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQuery;
+import com.firebase.geofire.GeoQueryEventListener;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -47,7 +74,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class HomeActivity extends AppCompatActivity{
+public class HomeActivity extends AppCompatActivity implements OnMapReadyCallback, GeoQueryEventListener {
+
+    private GoogleMap mMap;
+    private LocationRequest locationRequest;
+    private LocationCallback locationCallback;
+    private FusedLocationProviderClient fusedLocationProviderClient;
+    private Marker currentUser;
+    private DatabaseReference myLocationRef;
+    private GeoFire geoFire;
+    private List<LatLng> dangerousArea;
 
     Button search, moreImages, seeMap, addInfo, moreInfo, moreMore;
     LinearLayout seeMore;
@@ -73,6 +109,40 @@ public class HomeActivity extends AppCompatActivity{
         requestWindowFeature(Window.FEATURE_NO_TITLE);//will hide the title
         getSupportActionBar().hide(); //hide the title bar
         setContentView(R.layout.activity_home);
+
+        Dexter.withActivity(this)
+                .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                .withListener(new PermissionListener() {
+                    @Override
+                    public void onPermissionGranted(PermissionGrantedResponse response) {
+                        System.out.println(",,,,,,,,,,,,,,,,,,,,.....................................inside permission");
+                        buildLocationRequest();
+                        buildLocationCallback();
+                        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(HomeActivity.this);
+
+                        //  Obtain the SupportMapFragment and get notified when the map is ready to be used.
+                        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                                .findFragmentById(R.id.map);
+                        mapFragment.getMapAsync(HomeActivity.this);
+                        mapFragment.getView().setVisibility(View.GONE);
+
+                        initArea();
+
+                        settingGeoFire();
+
+                    }
+
+                    @Override
+                    public void onPermissionDenied(PermissionDeniedResponse response) {
+                        Toast.makeText(HomeActivity.this, "you must enable permission", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+
+                    }
+                })
+                .check();
 
         landmark = findViewById(R.id.landmark);
         title = findViewById(R.id.title);
@@ -201,22 +271,27 @@ public class HomeActivity extends AppCompatActivity{
                 head = document.select("h1").first();
                 placeTitle = head.text();
                 while(i < 10){
-                    if(document.select("p").get(i).text().isEmpty()){
-                        i++;
-                    }
-                    else{
-                        break;
-                    }
+                        if(document.select("p").get(i).text().isEmpty()){
+                            i++;
+                        }
+                        else{
+                            break;
+                        }
                 }
                 para1 = document.select("p").get(i);
                 para2 = document.select("p").get(i + 1);
                 if(flagText == 1){
                     for(int k = 2; k < 100; k++){
-                        if(!document.select("p").get(i + k).text().isEmpty()){
-                            para3[k-2] = document.select("p").get(i + k);
+                        try{
+                            if(!document.select("p").get(i + k).text().isEmpty()){
+                                para3[k-2] = document.select("p").get(i + k);
+                            }
+                            else{
+                                break;
+                            }
                         }
-                        else{
-                            break;
+                        catch(Exception e){
+
                         }
                     }
                 }
@@ -276,5 +351,195 @@ public class HomeActivity extends AppCompatActivity{
 
         return px;
     }
+
+
+
+
+
+
+
+    private void initArea() {
+        System.out.println(",,,,,,,,,,,,,,,,,,,,.....................................inside init method");
+
+        dangerousArea=new ArrayList<>();
+        dangerousArea.add(new LatLng(21.1801020,79.0609900));
+        dangerousArea.add(new LatLng(21.1801020,79.16));
+        dangerousArea.add(new LatLng(21.1801020,79.26));
+        dangerousArea.add(new LatLng(21.1801020,79.36));
+
+        dangerousArea.add(new LatLng(21.299202,79.074669));
+        dangerousArea.add(new LatLng(21.178952,79.041284));
+        dangerousArea.add(new LatLng(21.217915,79.078138));
+        dangerousArea.add(new LatLng(21.1801020,79.46));
+
+    }
+
+    private void settingGeoFire() {
+        System.out.println(",,,,,,,,,,,,,,,,,,,,.....................................inside setting geofire");
+
+        myLocationRef = FirebaseDatabase.getInstance().getReference("MyLocation");
+        geoFire=new GeoFire(myLocationRef);
+
+
+    }
+
+    private void buildLocationCallback() {
+        System.out.println(",,,,,,,,,,,,,,,,,,,,.....................................inside building location call back");
+
+        locationCallback=new LocationCallback(){
+            @Override
+            public void onLocationResult(final LocationResult locationResult) {
+                if(mMap!=null) {
+
+                    if (currentUser != null)
+                        currentUser.remove();//remove old marker
+                    currentUser = mMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(locationResult.getLastLocation().getLatitude(),
+                                    locationResult.getLastLocation().getLongitude()))
+                            .title("you"));
+                    //move camera to this position
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                            currentUser.getPosition(),12.0f));
+
+                    geoFire.setLocation("you", new GeoLocation(locationResult.getLastLocation().getLatitude(),
+                            locationResult.getLastLocation().getLongitude()), new GeoFire.CompletionListener() {
+                        @Override
+                        public void onComplete(String key, DatabaseError error) {
+                            if (currentUser != null)
+                                currentUser.remove();//remove old marker
+                            currentUser = mMap.addMarker(new MarkerOptions()
+                                    .position(new LatLng(locationResult.getLastLocation().getLatitude(),
+                                            locationResult.getLastLocation().getLongitude()))
+                                    .title("you"));
+                            //move camera to this position
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                                    currentUser.getPosition(),12.0f));
+                        }
+                    });
+                }
+
+            }
+        };
+
+    }
+
+    private void buildLocationRequest() {
+        System.out.println(",,,,,,,,,,,,,,,,,,,,.....................................inside build location request");
+
+        locationRequest = new LocationRequest();
+        locationRequest.setInterval(5000);
+        locationRequest.setFastestInterval(3000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setSmallestDisplacement(10f);
+    }
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        System.out.println(",,,,,,,,,,,,,,,,,,,,.....................................inside map ready");
+
+        mMap = googleMap;
+
+
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+
+        if(fusedLocationProviderClient!=null) {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) !=
+                        PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                        PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
+            }
+            fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
+
+            //add circle for dangerous area
+            for(LatLng latLng:dangerousArea){
+                mMap.addCircle(new CircleOptions().center(latLng)
+                        .radius(500)
+                        .strokeColor(Color.BLUE)
+                        .fillColor(0x220000FF) //it is transparent code
+                        .strokeWidth(5.0f)
+                );
+
+                //create GeoQuery when in dangerous location
+                GeoQuery geoQuery=geoFire.queryAtLocation(new GeoLocation(latLng.latitude,latLng.longitude),0.5f);
+                geoQuery.addGeoQueryEventListener(HomeActivity.this);
+
+            }
+
+        }
+    }
+    protected void onStop() {
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+        super.onStop();
+    }
+
+
+    @Override
+    public void onKeyEntered(String key, GeoLocation location) {
+        System.out.println(",,,,,,,,,,,,,,,,,,,,.....................................inside on key entered");
+
+        sendNotification("virtualGuide",String.format("checkout VirtualGuide Application to explore nearby places",key));
+    }
+
+    @Override
+    public void onKeyExited(String key) {
+        sendNotification("virtualGuide",String.format("is leave the dangerous area",key));
+
+    }
+
+    @Override
+    public void onKeyMoved(String key, GeoLocation location) {
+        sendNotification("virtualGuide",String.format("is move within the dangerous area",key));
+
+    }
+
+
+    @Override
+    public void onGeoQueryReady() {
+
+    }
+
+    @Override
+    public void onGeoQueryError(DatabaseError error) {
+        System.out.println(",,,,,,,,,,,,,,,,,,,,.....................................inside on geo query error");
+
+        Toast.makeText(this,""+error.getMessage(),Toast.LENGTH_SHORT).show();
+    }
+
+    private void sendNotification(String title, String content) {
+        System.out.println(",,,,,,,,,,,,,,,,,,,,.....................................inside sending notification");
+
+        String NOTIFICATION_CHANNEL_ID="geofire_multiple_location";
+
+
+        NotificationManager notificationManager=(NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
+            NotificationChannel notificationChannel=new NotificationChannel(NOTIFICATION_CHANNEL_ID,"my Notification",
+                    NotificationManager.IMPORTANCE_DEFAULT);
+            //config
+            notificationChannel.setDescription("channel description");
+            notificationChannel.enableLights(true);
+            notificationChannel.setLightColor(Color.RED);
+            notificationChannel.setVibrationPattern(new long[]{0,1000,500,1000});
+            notificationChannel.enableVibration(true);
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
+
+
+        NotificationCompat.Builder builder=new NotificationCompat.Builder(this,NOTIFICATION_CHANNEL_ID);
+        builder.setSmallIcon(R.mipmap.ic_launcher_round)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setAutoCancel(false)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(),R.mipmap.ic_launcher));
+
+
+        Notification notification=builder.build();
+
+        notificationManager.notify(new Random().nextInt(),notification);
+    }
+
 
 }

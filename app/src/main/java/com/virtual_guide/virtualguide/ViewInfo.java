@@ -96,6 +96,9 @@ public class ViewInfo extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 //        setContentView(R.layout.activity_view_info);
 
+
+        // do not show data stored in local cache
+        // called 3 times in try catch
         try {
             FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
                     .setPersistenceEnabled(false)
