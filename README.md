@@ -1,5 +1,6 @@
-# Virtual-Guide
 <img src="./previewM.gif" alt="animated" align="right" />
+
+# Virtual-Guide
 ## Virtual Guide App
 
 India is a major tourist destination which pulls millions of tourists every year. India is known
