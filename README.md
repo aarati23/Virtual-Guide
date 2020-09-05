@@ -1,6 +1,8 @@
 # Virtual-Guide
 ## Virtual Guide App
 
+<img src="./previewM.gif" alt="animated" />
+
 India is a major tourist destination which pulls millions of tourists every year. India is known
 for its beautiful beaches and hospitality. There are a number of monuments and landmarks
 depicting the cultural, history and development of India. Due to high inflow of domestic as
